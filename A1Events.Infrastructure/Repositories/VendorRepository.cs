@@ -61,4 +61,52 @@ public class VendorRepository : IVendorRepository
 
         return result.Single();
     }
+
+
+    public async Task<Vendor?> UpdateAsync(Vendor vendor)
+    {
+        var vendors = await _context.Vendors
+            .FromSqlInterpolated($"""
+            EXEC dbo.usp_Vendor_Update
+                @Id={vendor.Id},
+                @BusinessName={vendor.BusinessName},
+                @ContactPerson={vendor.ContactPerson},
+                @Phone={vendor.Phone},
+                @Email={vendor.Email},
+                @Description={vendor.Description},
+                @LogoUrl={vendor.LogoUrl},
+                @WebsiteUrl={vendor.WebsiteUrl},
+                @InstagramUrl={vendor.InstagramUrl},
+                @CategoryId={vendor.CategoryId}
+            """)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return vendors.FirstOrDefault();
+    }
+
+
+    public async Task<Vendor?> PublishAsync(int id)
+    {
+        var vendors = await _context.Vendors
+            .FromSqlInterpolated(
+                $"EXEC dbo.usp_Vendor_SetPublished @Id={id}, @IsPublished={true}")
+            .AsNoTracking()
+            .ToListAsync();
+
+        return vendors.FirstOrDefault();
+    }
+
+    public async Task<Vendor?> UnpublishAsync(int id)
+    {
+        var vendors = await _context.Vendors
+            .FromSqlInterpolated(
+                $"EXEC dbo.usp_Vendor_SetPublished @Id={id}, @IsPublished={false}")
+            .AsNoTracking()
+            .ToListAsync();
+
+        return vendors.FirstOrDefault();
+    }
+
+
 }

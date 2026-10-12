@@ -8,4 +8,12 @@ public interface IVendorService
     Task<VendorDto?> GetByIdAsync(int id);
     Task<IEnumerable<PublicVendorDto>> GetPublishedAsync();
     Task<VendorDto> CreateAsync(CreateVendorRequest request);
+
+    Task<VendorDto?> UpdateAsync(int id, UpdateVendorRequest request);
+
+    Task<VendorDto?> PublishAsync(int id);
+
+    Task<VendorDto?> UnpublishAsync(int id);
+
+
 }

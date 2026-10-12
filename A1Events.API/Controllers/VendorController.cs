@@ -1,5 +1,6 @@
 ﻿using A1Events.Application.DTOs;
 using A1Events.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace A1Events.API.Controllers;
@@ -64,4 +65,91 @@ public class VendorController : ControllerBase
             });
         }
     }
+
+
+    [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Update(
+        int id,
+        [FromBody] UpdateVendorRequest request)
+    {
+        try
+        {
+            var vendor = await _vendorService.UpdateAsync(id, request);
+
+            if (vendor == null)
+            {
+                return NotFound(new
+                {
+                    message = "Vendor not found."
+                });
+            }
+
+            return Ok(vendor);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
+        }
+    }
+
+
+    [HttpPut("{id:int}/publish")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Publish(int id)
+    {
+        try
+        {
+            var vendor = await _vendorService.PublishAsync(id);
+
+            if (vendor == null)
+            {
+                return NotFound(new
+                {
+                    message = "Vendor not found."
+                });
+            }
+
+            return Ok(vendor);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
+        }
+    }
+
+    [HttpPut("{id:int}/unpublish")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Unpublish(int id)
+    {
+        try
+        {
+            var vendor = await _vendorService.UnpublishAsync(id);
+
+            if (vendor == null)
+            {
+                return NotFound(new
+                {
+                    message = "Vendor not found."
+                });
+            }
+
+            return Ok(vendor);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
+        }
+    }
+
+
 }

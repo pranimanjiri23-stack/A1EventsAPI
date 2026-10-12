@@ -101,4 +101,93 @@ public class VendorService : IVendorService
 
         return MapToDto(createdVendor);
     }
+
+
+    public async Task<VendorDto?> UpdateAsync(
+        int id,
+        UpdateVendorRequest request)
+    {
+        if (id <= 0)
+            throw new ArgumentException("Invalid vendor ID.");
+
+        ArgumentNullException.ThrowIfNull(request);
+
+        if (string.IsNullOrWhiteSpace(request.BusinessName))
+            throw new ArgumentException("Business name is required.");
+
+        if (string.IsNullOrWhiteSpace(request.ContactPerson))
+            throw new ArgumentException("Contact person is required.");
+
+        if (string.IsNullOrWhiteSpace(request.Phone))
+            throw new ArgumentException("Phone is required.");
+
+        if (string.IsNullOrWhiteSpace(request.Email))
+            throw new ArgumentException("Email is required.");
+
+        if (request.CategoryId <= 0)
+            throw new ArgumentException("Invalid category ID.");
+
+        var existingVendor = await _vendorRepository.GetByIdAsync(id);
+
+        if (existingVendor == null)
+            return null;
+
+        existingVendor.BusinessName = request.BusinessName.Trim();
+        existingVendor.ContactPerson = request.ContactPerson.Trim();
+        existingVendor.Phone = request.Phone.Trim();
+        existingVendor.Email = request.Email.Trim();
+        existingVendor.Description = request.Description?.Trim() ?? string.Empty;
+        existingVendor.LogoUrl = request.LogoUrl;
+        existingVendor.WebsiteUrl = request.WebsiteUrl;
+        existingVendor.InstagramUrl = request.InstagramUrl;
+        existingVendor.CategoryId = request.CategoryId;
+
+        var updatedVendor = await _vendorRepository.UpdateAsync(existingVendor);
+
+        return updatedVendor == null ? null : MapToDto(updatedVendor);
+
+    }
+
+
+    public async Task<VendorDto?> PublishAsync(int id)
+    {
+        if (id <= 0)
+            throw new ArgumentException("Invalid vendor ID.");
+
+        var vendor = await _vendorRepository.GetByIdAsync(id);
+
+        if (vendor == null)
+            return null;
+
+        if (vendor.IsPublished)
+            return MapToDto(vendor);
+
+        var publishedVendor = await _vendorRepository.PublishAsync(id);
+
+        return publishedVendor == null
+            ? null
+            : MapToDto(publishedVendor);
+    }
+
+    public async Task<VendorDto?> UnpublishAsync(int id)
+    {
+        if (id <= 0)
+            throw new ArgumentException("Invalid vendor ID.");
+
+        var vendor = await _vendorRepository.GetByIdAsync(id);
+
+        if (vendor == null)
+            return null;
+
+        if (!vendor.IsPublished)
+            return MapToDto(vendor);
+
+        var unpublishedVendor = await _vendorRepository.UnpublishAsync(id);
+
+        return unpublishedVendor == null
+            ? null
+            : MapToDto(unpublishedVendor);
+    }
+
+
 }

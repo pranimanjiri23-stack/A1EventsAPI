@@ -9,5 +9,13 @@ public interface IVendorRepository
     Task<List<Vendor>> GetPublishedAsync();
 
     Task<Vendor> CreateAsync(Vendor vendor);
+
+    Task<Vendor?> UpdateAsync(Vendor vendor);
+    
+    Task<Vendor?> PublishAsync(int id);
+
+    Task<Vendor?> UnpublishAsync(int id);
+
+
 }
 
